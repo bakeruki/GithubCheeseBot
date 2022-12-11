@@ -33,9 +33,9 @@ public class GithubCheese extends Bot {
          * Dodging bullets is the priority, so this is the first move that will be executed.
          * If there is not a bullet to dodge, it proceeds to the next move.
          */
-        // if(dodgeBullets != 0){
-        //     return dodgeBullets;
-        // }
+        if(dodgeBullets != 0){
+            return dodgeBullets;
+        }
 
         /*
          * Firing bullets at nearby bots is the second priorty, so this is the second move that will be executed.
@@ -293,10 +293,7 @@ public class GithubCheese extends Bot {
     public int dodgeBullets(BotInfo me, Bullet[] bullets){
         double bulletsFromYToBot = 0;
         double bulletsFromXToBot = 0;
-        double centerX,centerY = 0;
-        double absDistY = 0;
-        double absDistX = 0;
-        
+        Bullet closeBullet = null;
         
          for(int i=0;i<bullets.length;i++){
             // Calculate the y-coord distance (pixels) of the bot and bullest on screen
@@ -306,10 +303,10 @@ public class GithubCheese extends Bot {
 
             // If the absolute value (in pixel) of the bullets relative to the bot is less than < 20 pixels AND 10 frames above the bot's center is > the bullet's y position
             // && the bullet's Y position is greater than 10 frames below the bot's center. Store the closest bullet to a variable and break out of the loop.
-            if(Math.abs(bulletsFromXToBot) < 25 && (bullets[i].getY() < me.getY() + 50 && bullets[i].getY() > me.getY() - 50)){
+            if(Math.abs(bulletsFromXToBot) < 50 && (bullets[i].getY() < me.getY() + 50 && bullets[i].getY() > me.getY() - 50)){
                 closeBullet = bullets[i];
                 break;
-            } else if(Math.abs(bulletsFromYToBot) < 25 && (bullets[i].getY() < me.getX() + 50 && bullets[i].getY() > me.getX() - 50)){
+            } else if(Math.abs(bulletsFromYToBot) < 50 && (bullets[i].getY() < me.getX() + 50 && bullets[i].getY() > me.getX() - 50)){
             // If the absolute value (in pixel) of the bullets relative to the bot is less than < 20 pixels AND 10 frames to the right of the bot's center is > the bullet's x position
             // && the bullet's x position is greater than 10 frames to the left of the bot's center. Store the closest bullet to a variable and break out of the loop.
                 closeBullet = bullets[i];
@@ -319,6 +316,11 @@ public class GithubCheese extends Bot {
                 continue; 
             } 
         }
+
+        if(closeBullet == null){
+            return 0;
+        }
+
             // If bullet is moving horizontally and the bullet is above the bot, move down
             if(closeBullet.getY() > me.getY() && closeBullet.getX() > me.getX()){
                 return BattleBotArena.DOWN;
