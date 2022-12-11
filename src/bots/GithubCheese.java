@@ -167,6 +167,7 @@ public class GithubCheese extends Bot {
 
     /**
      * Chooses a move to execute based on the edge that the bot is cycling at.
+     * @author Luqman Patel
      * @param x The x coordinate of our bot.
      * @param y The y coordinate of our bot.
      * @param lastMove The last move that our bot executed.
