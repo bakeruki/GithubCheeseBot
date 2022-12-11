@@ -27,7 +27,6 @@ public class GithubCheese extends Bot {
 
     @Override
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-        //sean put ur code up here so that mine only executes if yours is not executing
         int dodgeBullets = dodgeBullets(me, bullets);
         int fireBullets = fireBullets(me, liveBots, shotOK);
         // /*
@@ -169,6 +168,7 @@ public class GithubCheese extends Bot {
 
     /**
      * Chooses a move to execute based on the edge that the bot is cycling at.
+     * @author Luqman Patel
      * @param x The x coordinate of our bot.
      * @param y The y coordinate of our bot.
      * @param lastMove The last move that our bot executed.
