@@ -17,6 +17,8 @@ public class GithubCheese extends Bot {
     /*
      * Keeps track of the last directional cycle move that was performed (move that was not firing). 
      */
+    Bullet closeBullet = null;
+    BotInfo closeBot = null;
     private int lastCycleMove = 0;
 
     @Override
@@ -282,20 +284,10 @@ public class GithubCheese extends Bot {
         }
     }
 
-    /**
-     * Dodges bullets in the x-axis motion if bullet is a certain radius away from the relative position of the bot 
-     * or dodges bullets in the y-axis motion if the bullet is certain radius from the relative position from the bot.
-     * @author Sean
-     * @param me
-     * @param bullets
-     * @return
-     */
-    public int dodgeBullets(BotInfo me, Bullet[] bullets){
+    private double bulletDistanceCalculation(BotInfo me, Bullet[] bullets){
         double bulletsFromYToBot = 0;
         double bulletsFromXToBot = 0;
-        Bullet closeBullet = null;
-        
-         for(int i=0;i<bullets.length;i++){
+        for(int i=0;i<bullets.length;i++){
             // Calculate the y-coord distance (pixels) of the bot and bullest on screen
             bulletsFromYToBot = me.getY() - bullets[i].getY();
             // Calculate the x-coord distance (pixels) of the bot and bullest on screen
@@ -315,7 +307,21 @@ public class GithubCheese extends Bot {
             } else{
                 continue; 
             } 
+  
         }
+        return 0;
+    }
+    /**
+     * Dodges bullets in the x-axis motion if bullet is a certain radius away from the relative position of the bot 
+     * or dodges bullets in the y-axis motion if the bullet is certain radius from the relative position from the bot.
+     * @author Sean
+     * @param me
+     * @param bullets
+     * @return
+     */
+    public int dodgeBullets(BotInfo me, Bullet[] bullets){
+      
+      bulletDistanceCalculation(me, bullets);
 
         if(closeBullet == null){
             return 0;
@@ -338,23 +344,11 @@ public class GithubCheese extends Bot {
             }
             return 0;
         }
-    
-    
-    /**
-     * Fires bullets towards enemy bots when they are close
-     * @author Sean
-     * @param me
-     * @param liveBots
-     * @param shotOk
-     * @return
-     */
-    public int fireBullets(BotInfo me, BotInfo[] liveBots, boolean shotOk){
+
+
+    private void botDistanceCalculation(BotInfo me, BotInfo[] liveBots, boolean shotOk){
         double botsFromXToBot = 0;
         double botsFromYToBot = 0;
-        double opposite = 0;
-        double adjacent = 0;
-        BotInfo closeBot = null;
-        
         // Calculates the relative position of the bot to the current alive's bots' y and x coordinates
         for(int i=0;i<liveBots.length;i++){
             botsFromYToBot = me.getY() - liveBots[i].getY();
@@ -374,19 +368,38 @@ public class GithubCheese extends Bot {
                 continue; 
             } 
         }
-        
+    }
+    
+    private double radianCalculation (BotInfo me){
+        double opposite = 0;
+        double adjacent = 0;
+          // Calculate the opposite and adjacent side lengths based on the difference in distance of the closestBot and the bot
+          opposite = closeBot.getY() - me.getY();
+          adjacent = closeBot.getX() - me.getX();
+          // Inverse tan of opposite/adjacent to get the angle, and then converting it to degrees
+          double divide = opposite / adjacent;
+          double angle = Math.atan(divide);
+          return angle;
+    }
+    
+    /**
+     * Fires bullets towards enemy bots when they are close
+     * @author Sean
+     * @param me
+     * @param liveBots
+     * @param shotOk
+     * @return
+     */
+    public int fireBullets(BotInfo me, BotInfo[] liveBots, boolean shotOk){
+   
+        botDistanceCalculation(me, liveBots, shotOk);
+
         // If scan detects no nearby bots, stay still
         if(closeBot == null){
             return 0;
         }
         
-        // Calculate the opposite and adjacent side lengths based on the difference in distance of the closestBot and the bot
-        opposite = closeBot.getY() - me.getY();
-        adjacent = closeBot.getX() - me.getX();
-        // Inverse tan of opposite/adjacent to get the angle, and then converting it to degrees
-        double divide = opposite / adjacent;
-        double angle = Math.atan(divide);
-        double toDegrees = angle * (180 / Math.PI);
+        double toDegrees = radianCalculation(me) * (180 / Math.PI);
 
         // Testing to get 0 -> 360 format starting from Q4 -> Q1
         if(closeBot.getX() > me.getX() && closeBot.getY() < me.getY()){
@@ -404,6 +417,7 @@ public class GithubCheese extends Bot {
         else if (closeBot.getY() == me.getY() && closeBot.getX() < me.getX()){
             toDegrees = 180;
         }
+
         // Debugging purposes
         System.out.println(toDegrees);
 
@@ -426,7 +440,7 @@ public class GithubCheese extends Bot {
 
         }
 
-
+    
     @Override
     public void draw(Graphics g, int x, int y) {
 
