@@ -26,7 +26,6 @@ public class GithubCheese extends Bot {
 
     @Override
     public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-        //sean put ur code up here so that mine only executes if yours is not executing
         int dodgeBullets = dodgeBullets(me, bullets);
         int fireBullets = fireBullets(me, liveBots, shotOK);
         /*
