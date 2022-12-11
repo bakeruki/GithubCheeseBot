@@ -283,7 +283,7 @@ public class GithubCheese extends Bot {
         }
     }
 /**
-     * Checks whether the bot's move on the previous turn was a firing move.
+     * Calculates the distance of bullet from bot
      * @author Sean Lee
      * @param me To calculate relative distance of the bullet to the friendly bot
      * @param bullets 
@@ -352,7 +352,7 @@ public class GithubCheese extends Bot {
         }
 
 /**
-     * Checks whether the bot's move on the previous turn was a firing move.
+     * Calculate distance of bot from other bot
      * @author Sean Lee
      * @param me To calculate relative distance of the closest bot to the friendly bot
      * @param liveBots[] 

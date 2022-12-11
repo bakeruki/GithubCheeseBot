@@ -285,7 +285,7 @@ public class BattleBotArena extends JPanel implements MouseListener, MouseWheelL
 	 * Total number of Bots in round 1 (if you have fewer than this, the rest of the spots
 	 * in the array will be filled with Drones, RandBots, and Sentries).
 	 */
-	public static final int 	NUM_BOTS = 2;
+	public static final int 	NUM_BOTS = 16;
 	/**
 	 * Number of bullets on screen at once for each bot
 	 */
