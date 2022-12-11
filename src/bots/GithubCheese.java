@@ -298,42 +298,45 @@ public class GithubCheese extends Bot {
         double absDistX = 0;
         
         
-        for(int i=0;i<bullets.length;i++){
+         for(int i=0;i<bullets.length;i++){
             // Calculate the y-coord distance (pixels) of the bot and bullest on screen
             bulletsFromYToBot = me.getY() - bullets[i].getY();
             // Calculate the x-coord distance (pixels) of the bot and bullest on screen
             bulletsFromXToBot = me.getX() - bullets[i].getX();
-        
-            // If the absolute value (in pixel) of the bullets relative to the bot is less than < 20 pixels, break out of loop
-            if(Math.abs(bulletsFromXToBot) < 20 && (bullets[i].getY() < me.getY() + 10 && bullets[i].getY() > me.getY() - 10)){
+
+            // If the absolute value (in pixel) of the bullets relative to the bot is less than < 20 pixels AND 10 frames above the bot's center is > the bullet's y position
+            // && the bullet's Y position is greater than 10 frames below the bot's center. Store the closest bullet to a variable and break out of the loop.
+            if(Math.abs(bulletsFromXToBot) < 25 && (bullets[i].getY() < me.getY() + 50 && bullets[i].getY() > me.getY() - 50)){
+                closeBullet = bullets[i];
                 break;
-            } else if(Math.abs(bulletsFromYToBot) < 20 && (bullets[i].getY() < me.getX() + 10 && bullets[i].getY() > me.getX() - 10)){
+            } else if(Math.abs(bulletsFromYToBot) < 25 && (bullets[i].getY() < me.getX() + 50 && bullets[i].getY() > me.getX() - 50)){
+            // If the absolute value (in pixel) of the bullets relative to the bot is less than < 20 pixels AND 10 frames to the right of the bot's center is > the bullet's x position
+            // && the bullet's x position is greater than 10 frames to the left of the bot's center. Store the closest bullet to a variable and break out of the loop.
+                closeBullet = bullets[i];
                 break;
                 // If not, continue
             } else{
                 continue; 
             } 
         }
+            // If bullet is moving horizontally and the bullet is above the bot, move down
+            if(closeBullet.getY() > me.getY() && closeBullet.getX() > me.getX()){
+                return BattleBotArena.DOWN;
 
-        // Calculate 
-        centerX = me.getX() - bulletsFromXToBot + 25;
-        centerY = me.getY() - bulletsFromYToBot + 25;
-
-        absDistY = Math.abs(centerY - bulletsFromYToBot);
-        absDistX = Math.abs(centerX - bulletsFromXToBot);
-
-        if(centerY > bulletsFromYToBot && absDistY < 25){
-            return BattleBotArena.LEFT;
-        } else if(centerY < bulletsFromYToBot && absDistY < 25){
-            return BattleBotArena.RIGHT;
-        } else if(centerX > bulletsFromXToBot && absDistX < 25){
-            return BattleBotArena.DOWN;
-        } else if(centerX < bulletsFromXToBot && absDistX < 25){
-            return BattleBotArena.UP;
+                // If bullet is moving horizontally and the bullet is below the bot, move up
+            } else if(closeBullet.getY() > me.getY() && me.getX() > closeBullet.getX()){
+                return BattleBotArena.UP;
+                
+                // If bullet is moving vertically and the bullet is to the left of the bot, move right
+            } else if((closeBullet.getY() < me.getY() && closeBullet.getX() > me.getX()) || closeBullet.getY() < me.getY() && closeBullet.getX() < me.getX() ){
+                return BattleBotArena.RIGHT;
+                // If bullet is moving vertically and the bullet is to the right of the bot, move left
+            } else if(closeBullet.getY() > me.getY() && closeBullet.getX() > me.getX() || closeBullet.getY() > me.getY() && closeBullet.getX() > me.getX()) {
+                return BattleBotArena.LEFT;
+            }
+            return 0;
         }
-
-        return 0;
-    }
+    
     
     /**
      * Fires bullets towards enemy bots when they are close
@@ -350,33 +353,40 @@ public class GithubCheese extends Bot {
         double adjacent = 0;
         BotInfo closeBot = null;
         
+        // Calculates the relative position of the bot to the current alive's bots' y and x coordinates
         for(int i=0;i<liveBots.length;i++){
             botsFromYToBot = me.getY() - liveBots[i].getY();
             botsFromXToBot = me.getX() - liveBots[i].getX();
-
+        // If the bot is 75 pixels away from the bot AND the bot's y coordinates is greater than 100 frames below the bot AND the bot's y coordinates is 
+            // greater than 100 frames above the bot AND it is OK to shoot. Store the closest bot to the bot to a variable and break out of the loop
             if(Math.abs(botsFromXToBot) < 75 && me.getY() - 100 < liveBots[i].getY() && me.getY() + 100 > liveBots[i].getY() && shotOk){
                 closeBot = liveBots[i];
                 break;
+                 // If the bot is 75 pixels away from the bot AND the bot's X coordinates is greater than 100 frames to the left the bot AND the bot's X coordinates is 
+            // greater than 100 frames to the right of the bot AND it is OK to shoot. Store the closest bot to the bot to a variable and break out of the loop
             } else if(Math.abs(botsFromYToBot) < 75 && me.getX() - 100 < liveBots[i].getX() && me.getX() + 100 > liveBots[i].getX() && shotOk){
                 closeBot = liveBots[i];
                 break;
+                // If no bots are near, continue scanning
             } else{
                 continue; 
             } 
         }
-
+        
+        // If scan detects no nearby bots, stay still
         if(closeBot == null){
             return 0;
         }
         
-        //some trig magic
+        // Calculate the opposite and adjacent side lengths based on the difference in distance of the closestBot and the bot
         opposite = closeBot.getY() - me.getY();
         adjacent = closeBot.getX() - me.getX();
-        //oooo more trig magic 
+        // Inverse tan of opposite/adjacent to get the angle, and then converting it to degrees
         double divide = opposite / adjacent;
         double angle = Math.atan(divide);
         double toDegrees = angle * (180 / Math.PI);
 
+        // Testing to get 0 -> 360 format starting from Q4 -> Q1
         if(closeBot.getX() > me.getX() && closeBot.getY() < me.getY()){
             toDegrees += 360;
         }else if(closeBot.getX() < me.getX() && closeBot.getY() < me.getY()){
@@ -392,19 +402,24 @@ public class GithubCheese extends Bot {
         else if (closeBot.getY() == me.getY() && closeBot.getX() < me.getX()){
             toDegrees = 180;
         }
-
+        // Debugging purposes
         System.out.println(toDegrees);
 
+            // If the degree from closestBot and the bot's distance difference is greater or equal to 45 degrees AND less than 135 degrees, fire DOWN
         if(toDegrees >= 45 && toDegrees < 135){
             return BattleBotArena.FIREDOWN;
+            // If the degree from closestBot and the bot's distance difference is greater or equal to 135 degrees AND less than 215 degrees, fire LEFT
         }else if(toDegrees >= 135 && toDegrees < 215){
             return BattleBotArena.FIRELEFT;
+            // If the degree from closestBot and the bot's distance difference is greater or equal to 215 degrees AND less than 215 degrees, fire UP
         }else if(toDegrees >= 215 && toDegrees < 305){
             return BattleBotArena.FIREUP;
+            // If the degree from closestBot and the bot's distance difference is greater or equal to 305 degrees AND less than 360 degrees OR
+            // greater or equal to 0 AND less than 45, fire RIGHT
         }else if((toDegrees >= 305 && toDegrees < 360) || (toDegrees >= 0 && toDegrees < 45)){
             return BattleBotArena.FIRERIGHT;
         }
-
+        
         return 0;
 
         }
