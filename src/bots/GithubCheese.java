@@ -17,6 +17,7 @@ public class GithubCheese extends Bot {
     /*
      * Keeps track of the last directional cycle move that was performed (move that was not firing). 
      */
+    
     private int lastCycleMove = 0;
 
     @Override
@@ -29,10 +30,10 @@ public class GithubCheese extends Bot {
         //sean put ur code up here so that mine only executes if yours is not executing
         int dodgeBullets = dodgeBullets(me, bullets);
         int fireBullets = fireBullets(me, liveBots, shotOK);
-        /*
-         * Dodging bullets is the priority, so this is the first move that will be executed.
-         * If there is not a bullet to dodge, it proceeds to the next move.
-         */
+        // /*
+        //  * Dodging bullets is the priority, so this is the first move that will be executed.
+        //  * If there is not a bullet to dodge, it proceeds to the next move.
+        //  */
         if(dodgeBullets != 0){
             return dodgeBullets;
         }
@@ -49,24 +50,24 @@ public class GithubCheese extends Bot {
         int moveToEdge = moveToEdge(me.getX(), me.getY(), chosenEdge);
         int cycleMove = cycleOnEdge(me.getX(), me.getY(), me.getLastMove(), chosenEdge, shotOK, 0.05);
 
-        /*
-         * If we are not already at our chosen cycleEdge, we must first get there.
-         * If we are already there, it proceeds to the next move.
-         */
+        // /*
+        //  * If we are not already at our chosen cycleEdge, we must first get there.
+        //  * If we are already there, it proceeds to the next move.
+        //  */
         if(moveToEdge != 0){
             return moveToEdge;
         }
 
-        /*
-         * Cycling across the edge is the backbone of our strategy, however it takes the least priority. 
-         */
+        // /*
+        //  * Cycling across the edge is the backbone of our strategy, however it takes the least priority. 
+        //  */
         if(cycleMove != 0){
                 return cycleMove;
         }
         
-        /*
-         * If the bot does not move, we know there is a bug in our code somewhere.
-         */
+        // /*
+        //  * If the bot does not move, we know there is a bug in our code somewhere.
+        //  */
         return BattleBotArena.STAY;
     }
 
@@ -281,21 +282,18 @@ public class GithubCheese extends Bot {
                 return false;
         }
     }
-
-    /**
-     * Dodges bullets in the x-axis motion if bullet is a certain radius away from the relative position of the bot 
-     * or dodges bullets in the y-axis motion if the bullet is certain radius from the relative position from the bot.
-     * @author Sean
-     * @param me
-     * @param bullets
-     * @return
+/**
+     * Calculates the distance of bullet from bot
+     * @author Sean Lee
+     * @param me To calculate relative distance of the bullet to the friendly bot
+     * @param bullets 
+     * @return Returns closeBullet if a bullet is less than a certain distance from the bot
      */
-    public int dodgeBullets(BotInfo me, Bullet[] bullets){
+    private Bullet bulletDistanceCalculation(BotInfo me, Bullet[] bullets){
+        Bullet closeBullet = null;
         double bulletsFromYToBot = 0;
         double bulletsFromXToBot = 0;
-        Bullet closeBullet = null;
-        
-         for(int i=0;i<bullets.length;i++){
+        for(int i=0;i<bullets.length;i++){
             // Calculate the y-coord distance (pixels) of the bot and bullest on screen
             bulletsFromYToBot = me.getY() - bullets[i].getY();
             // Calculate the x-coord distance (pixels) of the bot and bullest on screen
@@ -315,9 +313,23 @@ public class GithubCheese extends Bot {
             } else{
                 continue; 
             } 
+  
         }
+        return closeBullet;
+    }
+    /**
+     * Dodges bullets in the x-axis motion if bullet is a certain radius away from the relative position of the bot 
+     * or dodges bullets in the y-axis motion if the bullet is certain radius from the relative position from the bot.
+     * @author Sean
+     * @param me
+     * @param bullets
+     * @return
+     */
+    public int dodgeBullets(BotInfo me, Bullet[] bullets){
+      
+        Bullet closeBullet = bulletDistanceCalculation(me,bullets);
 
-        if(closeBullet == null){
+        if( bulletDistanceCalculation(me, bullets) == null){
             return 0;
         }
 
@@ -338,23 +350,19 @@ public class GithubCheese extends Bot {
             }
             return 0;
         }
-    
-    
-    /**
-     * Fires bullets towards enemy bots when they are close
-     * @author Sean
-     * @param me
-     * @param liveBots
-     * @param shotOk
-     * @return
+
+/**
+     * Calculate distance of bot from other bot
+     * @author Sean Lee
+     * @param me To calculate relative distance of the closest bot to the friendly bot
+     * @param liveBots[] 
+     * @param shotOK to check if it is fine to shoot 
+     * @return Returns closeBot if bot is less than a certain radius away from friendly's bot
      */
-    public int fireBullets(BotInfo me, BotInfo[] liveBots, boolean shotOk){
+    private BotInfo botDistanceCalculation(BotInfo me, BotInfo[] liveBots, boolean shotOk){
         double botsFromXToBot = 0;
         double botsFromYToBot = 0;
-        double opposite = 0;
-        double adjacent = 0;
         BotInfo closeBot = null;
-        
         // Calculates the relative position of the bot to the current alive's bots' y and x coordinates
         for(int i=0;i<liveBots.length;i++){
             botsFromYToBot = me.getY() - liveBots[i].getY();
@@ -374,18 +382,32 @@ public class GithubCheese extends Bot {
                 continue; 
             } 
         }
-        
+        return closeBot;
+    }
+    
+    /**
+     * Fires bullets towards enemy bots when they are close
+     * @author Sean
+     * @param me
+     * @param liveBots
+     * @param shotOk
+     * @return
+     */
+    public int fireBullets(BotInfo me, BotInfo[] liveBots, boolean shotOk){
+   
+        BotInfo closeBot = botDistanceCalculation(me, liveBots, shotOk);
+
         // If scan detects no nearby bots, stay still
         if(closeBot == null){
             return 0;
         }
-        
-        // Calculate the opposite and adjacent side lengths based on the difference in distance of the closestBot and the bot
-        opposite = closeBot.getY() - me.getY();
-        adjacent = closeBot.getX() - me.getX();
+         // Calculate the opposite and adjacent side lengths based on the difference in distance of the closestBot and the bot
+        double opposite = closeBot.getY() - me.getY();
+        double adjacent = closeBot.getX() - me.getX();
         // Inverse tan of opposite/adjacent to get the angle, and then converting it to degrees
         double divide = opposite / adjacent;
         double angle = Math.atan(divide);
+    
         double toDegrees = angle * (180 / Math.PI);
 
         // Testing to get 0 -> 360 format starting from Q4 -> Q1
@@ -404,6 +426,7 @@ public class GithubCheese extends Bot {
         else if (closeBot.getY() == me.getY() && closeBot.getX() < me.getX()){
             toDegrees = 180;
         }
+
         // Debugging purposes
         System.out.println(toDegrees);
 
@@ -421,12 +444,12 @@ public class GithubCheese extends Bot {
         }else if((toDegrees >= 305 && toDegrees < 360) || (toDegrees >= 0 && toDegrees < 45)){
             return BattleBotArena.FIRERIGHT;
         }
-        
+
         return 0;
 
         }
 
-
+    
     @Override
     public void draw(Graphics g, int x, int y) {
 
