@@ -285,8 +285,8 @@ public class GithubCheese extends Bot {
 /**
      * Calculates the distance of bullet from bot
      * @author Sean Lee
-     * @param me To calculate relative distance of the bullet to the friendly bot
-     * @param bullets 
+     * @param me To calculate the x and y coordinates of the friendly bot
+     * @param bullets To calculate the x and y coordinates of the enemy bot
      * @return Returns closeBullet if a bullet is less than a certain distance from the bot
      */
     private Bullet bulletDistanceCalculation(BotInfo me, Bullet[] bullets){
@@ -354,8 +354,8 @@ public class GithubCheese extends Bot {
 /**
      * Calculate distance of bot from other bot
      * @author Sean Lee
-     * @param me To calculate relative distance of the closest bot to the friendly bot
-     * @param liveBots[] 
+     * @param me To get the x and y coordinates of the friendly bot
+     * @param liveBots[] To get the x and y coordinates of the enemy bot
      * @param shotOK to check if it is fine to shoot 
      * @return Returns closeBot if bot is less than a certain radius away from friendly's bot. Return 0 if there is a bug
      */
@@ -426,9 +426,6 @@ public class GithubCheese extends Bot {
         else if (closeBot.getY() == me.getY() && closeBot.getX() < me.getX()){
             toDegrees = 180;
         }
-
-        // Debugging purposes
-        System.out.println(toDegrees);
 
             // If the degree from closestBot and the bot's distance difference is greater or equal to 45 degrees AND less than 135 degrees, fire DOWN
         if(toDegrees >= 45 && toDegrees < 135){
