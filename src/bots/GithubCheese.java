@@ -321,9 +321,9 @@ public class GithubCheese extends Bot {
      * Dodges bullets in the x-axis motion if bullet is a certain radius away from the relative position of the bot 
      * or dodges bullets in the y-axis motion if the bullet is certain radius from the relative position from the bot.
      * @author Sean
-     * @param me
-     * @param bullets
-     * @return
+     * @param me To get the coordinates of the friendly's bot's x and y coordinates
+     * @param bullets To get the coordinates of the enemy's bots' x and y coordinates
+     * @return Returns the move (up/down/left/right) 
      */
     public int dodgeBullets(BotInfo me, Bullet[] bullets){
       
@@ -357,7 +357,7 @@ public class GithubCheese extends Bot {
      * @param me To calculate relative distance of the closest bot to the friendly bot
      * @param liveBots[] 
      * @param shotOK to check if it is fine to shoot 
-     * @return Returns closeBot if bot is less than a certain radius away from friendly's bot
+     * @return Returns closeBot if bot is less than a certain radius away from friendly's bot. Return 0 if there is a bug
      */
     private BotInfo botDistanceCalculation(BotInfo me, BotInfo[] liveBots, boolean shotOk){
         double botsFromXToBot = 0;
@@ -388,10 +388,10 @@ public class GithubCheese extends Bot {
     /**
      * Fires bullets towards enemy bots when they are close
      * @author Sean
-     * @param me
-     * @param liveBots
-     * @param shotOk
-     * @return
+     * @param me To get the friendly's bot's x and y coordinates
+     * @param liveBots To get the currently alive bots' x and y coordinates
+     * @param shotOk To check if it is OK to shoot
+     * @return Returns the move (fire up/down/left/right). Return 0 if there is a bug
      */
     public int fireBullets(BotInfo me, BotInfo[] liveBots, boolean shotOk){
    
