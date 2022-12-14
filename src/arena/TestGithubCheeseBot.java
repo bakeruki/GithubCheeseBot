@@ -205,76 +205,91 @@ public class TestGithubCheeseBot {
         //---------------------------------------------------------------------------------------------
         //
 
-        /*Creating a the bot it self and giving its it location. Using this I am able to simulate different bot positions without having to change the psoition i just need to uncomment them. */
+        // Created a bot that will be representing us. I give it a name that is related to its location on the grid. I provide it with its x and y values. These bots are used to represent us and run the methods and test cases.
+        // This was done to minimize the amount of code needed to be written and instead of having to create a bot inside each test I could just use it from here. 
         BotInfo meUpLeft = new BotInfo(0, 100, 0, "");
-        //BotInfo meUpRight = new BotInfo(425, 500, 0, "");
-        //BotInfo meDownRight= new BotInfo(425, 75, 0, "");
+        BotInfo meUpRight = new BotInfo(450, 100, 0, "");
+        BotInfo meDownRight = new BotInfo(500, 500, 0, "");
+        BotInfo meDownLeft = new BotInfo(0, 600, 0, "");
 
-        /* I am creating the enemy bot for which I am gonna be calling it the methods for. I am first stating how many bots there are alive and then creating the bots with their positions. */
-        BotInfo[] liveBots = new BotInfo[2];
-        BotInfo infoDownLeft = new BotInfo(10, 110, 0, "");
+        // I create the enemy bots whose x and y coordinates we will be using to search and run our methods. I provide them with their names which are relative to their positions in the arena. Again created for ease of usage.
+        BotInfo[] liveBots = new BotInfo[4];
+        BotInfo infoDownLeft = new BotInfo(10, 550, 0, "");
         BotInfo infoUpLeft = new BotInfo(20, 120, 0, "");
-        // BotInfo infoUpRight = new BotInfo(425, 425, 0, "");
-        // BotInfo infoDownRight = new BotInfo(425, 150, 0, "");
+        BotInfo infoUpRight = new BotInfo(450, 120, 0, "");
+        BotInfo infoDownRight = new BotInfo(500, 480, 0, "");
         liveBots[0] = infoDownLeft;
         liveBots[1] = infoUpLeft;
-        // liveBots[2] = infoUpRight;
-        // liveBots[3] = infoDownRight;
-
-        /* Not currently in use but could be used to simulate dead bots left it in the code in case we had future plans to simulate dead bots. */
-        //BotInfo[] deadBots = new BotInfo[0];
+        liveBots[2] = infoUpRight;
+        liveBots[3] = infoDownRight;
         
-        /* Creating the bullet it self. First we state how many bullets there are. Which currenly is set to one as we dont need more that for our test but this allows for us to have multiple bullets incoming. */
-        Bullet[] bullets = new Bullet[1];
-        Bullet bullet = new Bullet(10, 110, 0.5, 0.5);
-        bullets[0] = bullet;
+        // I created the bullets which are required to run one of our methods. I give them an x and y value. 
+        Bullet[] bullets = new Bullet[4];
+        Bullet bullet1 = new Bullet(10, 110, 0.5, 0.5);
+        Bullet bullet2 = new Bullet(460, 110, 0.5, 0.5);
+        Bullet bullet3 = new Bullet(10, 590, 0.5, 0.5);
+        Bullet bullet4 = new Bullet(490, 490, 0.5, 0.5);
+        bullets[0] = bullet1;
+        bullets[1] = bullet2;
+        bullets[2] = bullet3;
+        bullets[3] = bullet4;
         
-        /* Here we are calling on the methods that has been created for our bot and provinding it with our simulated input to see it the method works as intended. In this specific case if a bot is in a radius of 100 pixels the bot should say that a bullet has been shot. */
+        // Here we start to test our first method. In this specific case, our bot has been placed Top left and the enemy bot is under it. Under these circumstances, the bot should fire down. If it does the test passes if it doesn't the test fails.
         int bulletsFired = githubCheese.fireBullets(meUpLeft, liveBots, true);
-        System.out.println(bulletsFired);
         if (bulletsFired == BattleBotArena.FIREDOWN) {
-            System.out.println("Bullets have been fired down");
+            System.out.println("Passed");
         } else {
-            System.out.println("bullet fired up test case failed");
+            System.out.println("Failed");
         }
-        /* These are the other cases that could be run using the multiple bots and enemy bots I have created above as this is simpler to uncomment than to change variables. */
-        // int bulletsFired = githubCheese.fireBullets(meDownRight, liveBots, true);
-        // System.out.println(bulletsFired);
-        // if (bulletsFired == BattleBotArena.FIREUP) {
-        //     System.out.println("Bullets have been fired down");
-        // } else {
-        //     System.out.println("bullet fired up test case failed");
-        // }
+        // I am doing the same test here just testing for a bot in a different position where it is firing up. 
+        bulletsFired = githubCheese.fireBullets(meDownRight, liveBots, true);
+        if (bulletsFired == BattleBotArena.FIREUP) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
+        // Checking if the bot fires down
+        bulletsFired = githubCheese.fireBullets(meUpRight, liveBots, true);
+        if (bulletsFired == BattleBotArena.FIREDOWN) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
+        //Checking if it fires up. 
+        bulletsFired = githubCheese.fireBullets(meDownLeft, liveBots, true);
+        if (bulletsFired == BattleBotArena.FIREUP) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
 
-        // int bulletsFired = githubCheese.fireBullets(meUpRight, liveBots, true);
-        // System.out.println(bulletsFired);
-        // if (bulletsFired == BattleBotArena.FIREDOWN) {
-        //     System.out.println("Bullets have been fired down");
-        // } else {
-        //     System.out.println("bullet fired up test case failed");
-        // }
-
-        /* Here we are doing something similar to the pervious test case. We call on the method to dodge bullets and then give it the values for our bot and the bullet. If it takes the predetermined action then it passes. */
+        // Testing to see if our second defensive method works or not. Under the bullet Dogged method if a bullet comes closer than a certain radius the bot is supposed to avoid it by either moving up or down. or left or right. In this specific case, we have the bot's specific position and we want the bot to avoid the bullet by moving down as that is the most optimal way to avoid the bullet. If the bullet is avoided by moving down the test passes if it's not the test fails. 
         int bulletsDodged = githubCheese.dodgeBullets(meUpLeft, bullets);
         if (bulletsDodged == BattleBotArena.DOWN) {
-            System.out.println("Bullet dodged by moving down");
+            System.out.println("Passed");
         } else {
-            System.out.println("test case failed");
+            System.out.println("Failed");
         }
-        /* Again same thing as before it is easier to have them preset for different cases rather than to change variables. */
-        // int bulletsDodged = githubCheese.dodgeBullets(meUpRight, bullets);
-        // if (bulletsDodged == BattleBotArena.DOWN) {
-        //     System.out.println("Bullet dodged by moving down");
-        // } else {
-        //     System.out.println("test case failed");
-        // }
-
-        // int bulletsDodged = githubCheese.dodgeBullets(meDownRight, bullets);
-        // if (bulletsDodged == BattleBotArena.UP) {
-        //     System.out.println("Bullet dodged by moving down");
-        // } else {
-        //     System.out.println("test case failed");
-        // }
-       
+        // Same test as the last one, checking if it moves down but the bot's position is changed.
+        bulletsDodged = githubCheese.dodgeBullets(meUpRight, bullets);
+        if (bulletsDodged == BattleBotArena.DOWN) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
+        // Bot position changed and checking to see if it moves right to avoid the bullet. 
+        bulletsDodged = githubCheese.dodgeBullets(meDownRight, bullets);
+        if (bulletsDodged == BattleBotArena.RIGHT) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
+        // Same as the previous test, the bot's position is changed. 
+        bulletsDodged = githubCheese.dodgeBullets(meDownLeft, bullets);
+        if (bulletsDodged == BattleBotArena.RIGHT) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Failed");
+        }
     }
 }
