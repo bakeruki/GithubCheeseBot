@@ -1,5 +1,6 @@
 package bots;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -19,6 +20,7 @@ public class GithubCheese extends Bot {
      */
     
     private int lastCycleMove = 0;
+    private Image image = null;
 
     @Override
     public void newRound() {
@@ -445,11 +447,15 @@ public class GithubCheese extends Bot {
         return 0;
 
         }
-
     
     @Override
     public void draw(Graphics g, int x, int y) {
-
+        if(image != null){
+            g.drawImage(image, x, y, Bot.RADIUS*2, Bot.RADIUS*2, null);
+        }else{
+            g.setColor(Color.yellow);
+            g.fillOval(x, y, Bot.RADIUS*2, Bot.RADIUS*2);
+        }
     }
 
     @Override
@@ -474,12 +480,15 @@ public class GithubCheese extends Bot {
 
     @Override
     public String[] imageNames() {
-        return null;
+        String[] paths = {"cheese.png"};
+        return paths;
     }
 
     @Override
     public void loadedImages(Image[] images) {
-
+        if(images != null && images.length > 0){
+            image = images[0];
+        }
     }
 
 }
